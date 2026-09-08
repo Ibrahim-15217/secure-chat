@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+.env.production
+*.pem
+
+# Build output
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Supabase generated
+supabase/.temp/
+
+# Editor
+.vscode/
+.idea/
+
+# Misc
+*.tmp
