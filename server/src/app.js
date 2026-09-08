@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 const config = require('./config');
 const routes = require('./routes');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -17,6 +18,7 @@ if (config.env === 'development') {
 }
 
 app.use('/api', routes);
+app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
