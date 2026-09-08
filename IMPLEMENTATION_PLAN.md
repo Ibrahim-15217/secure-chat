@@ -54,29 +54,29 @@ main                       (stable — only approved, tested work)
 Stand up the base project structure, version control, environment config, and connectivity skeleton (no real features yet).
 
 ### Tasks
-- [ ] Create Git repo with branching strategy (`main`, `develop`).
-- [ ] Initialize React frontend (`client/`) with Tailwind CSS.
-- [ ] Initialize Node + Express backend (`server/`).
-- [ ] Add `database/`, `docs/`, `tests/` directory scaffolding.
-- [ ] Create `.env.example` with placeholders (no real secrets).
-- [ ] Add `.gitignore` (node_modules, .env, etc.).
-- [ ] Add root `README.md`.
-- [ ] Basic `client` <-> `server` health-check connection.
-- [ ] Prepare Supabase connection skeleton (local/placeholder config).
+- [x] Create Git repo with branching strategy (`main`, `develop`).
+- [x] Initialize React frontend (`client/`) with Tailwind CSS.
+- [x] Initialize Node + Express backend (`server/`).
+- [x] Add `database/`, `docs/`, `tests/` directory scaffolding.
+- [x] Create `.env.example` with placeholders (no real secrets).
+- [x] Add `.gitignore` (node_modules, .env, etc.).
+- [x] Add root `README.md`.
+- [x] Basic `client` <-> `server` health-check connection.
+- [x] Prepare Supabase connection skeleton (local/placeholder config).
 
 ### Tests
-- [ ] Frontend loads (`npm start`).
-- [ ] Backend starts and responds to a health endpoint.
-- [ ] Frontend can reach backend health endpoint.
-- [ ] Git repo is valid; branches exist.
-- [ ] No secrets appear in the repo.
-- [ ] `.env.example` lists all required variables.
+- [x] Frontend loads (`npm run dev` / Vite on port 3000).
+- [x] Backend starts and responds to a health endpoint.
+- [x] Frontend can reach backend health endpoint (via proxy).
+- [x] Git repo is valid; branches exist.
+- [x] No secrets appear in the repo.
+- [x] `.env.example` lists all required variables.
 
 ### Definition of Done
-- [ ] Base structure in place and runnable locally.
-- [ ] All above tests pass.
-- [ ] **USER APPROVAL** received.
-- [ ] Committed to `main` (or tagged) before Phase 2.
+- [x] Base structure in place and runnable locally.
+- [x] All above tests pass.
+- [x] **USER APPROVAL** received.
+- [x] Committed to `main` (or tagged) before Phase 2.
 
 ---
 
@@ -435,7 +435,7 @@ Finalize the project for submission.
 
 | Phase | Status | Tests | User Approved | Committed |
 |-------|--------|-------|---------------|-----------|
-| 1 Foundation | [ ] | [ ] | [ ] | [ ] |
+| 1 Foundation | [x] | [x] | [x] | [x] |
 | 2 Authentication | [ ] | [ ] | [ ] | [ ] |
 | 3 2FA & RBAC | [ ] | [ ] | [ ] | [ ] |
 | 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
