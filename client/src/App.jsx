@@ -7,6 +7,7 @@ import TwoFactorVerifyPage from './pages/TwoFactorVerifyPage'
 import DashboardPage from './pages/DashboardPage'
 import SecurityPage from './pages/SecurityPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import KeyManagementPage from './pages/KeyManagementPage'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/security" element={<SecurityPage />} />
+            <Route path="/keys" element={<KeyManagementPage />} />
             <Route path="/admin" element={<AdminDashboardPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

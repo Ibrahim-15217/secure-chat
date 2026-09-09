@@ -7,6 +7,7 @@ const config = require('./config');
 const routes = require('./routes');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const cryptoRoutes = require('./routes/crypto');
 
 const app = express();
 
@@ -21,6 +22,7 @@ if (config.env === 'development') {
 app.use('/api', routes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/crypto', cryptoRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
