@@ -116,24 +116,24 @@ Secure registration and login.
 Multi-factor authentication and role-based access control.
 
 ### Tasks
-- [ ] TOTP secret generation + setup page.
-- [ ] TOTP verification step in login flow.
-- [ ] Enable/disable 2FA endpoints.
-- [ ] `user` and `admin` roles.
-- [ ] Authorization middleware (backend).
-- [ ] Protected admin endpoints.
-- [ ] 2FA verification page.
+- [x] TOTP secret generation + setup page.
+- [x] TOTP verification step in login flow.
+- [x] Enable/disable 2FA endpoints.
+- [x] `user` and `admin` roles.
+- [x] Authorization middleware (backend).
+- [x] Protected admin endpoints.
+- [x] 2FA verification page.
 
 ### Tests
-- [ ] TOTP required when enabled.
-- [ ] Wrong TOTP code rejected.
-- [ ] Ordinary user blocked from admin endpoints.
-- [ ] Role checks enforced server-side.
+- [x] TOTP required when enabled.
+- [x] Wrong TOTP code rejected.
+- [x] Ordinary user blocked from admin endpoints.
+- [x] Role checks enforced server-side.
 
 ### Definition of Done
-- [ ] 2FA + RBAC working.
-- [ ] All tests pass.
-- [ ] **USER APPROVAL** received.
+- [x] 2FA + RBAC working.
+- [x] All tests pass.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -437,7 +437,7 @@ Finalize the project for submission.
 |-------|--------|-------|---------------|-----------|
 | 1 Foundation | [x] | [x] | [x] | [x] |
 | 2 Authentication | [x] | [x] | [x] | [x] |
-| 3 2FA & RBAC | [ ] | [ ] | [ ] | [ ] |
+| 3 2FA & RBAC | [x] | [x] | [x] | [x] |
 | 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
 | 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |
 | 6 Socket.IO Real-Time | [ ] | [ ] | [ ] | [ ] |

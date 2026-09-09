@@ -3,7 +3,10 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './context/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import TwoFactorVerifyPage from './pages/TwoFactorVerifyPage'
 import DashboardPage from './pages/DashboardPage'
+import SecurityPage from './pages/SecurityPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 function App() {
   return (
@@ -13,8 +16,11 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-2fa" element={<TwoFactorVerifyPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/admin" element={<AdminDashboardPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
