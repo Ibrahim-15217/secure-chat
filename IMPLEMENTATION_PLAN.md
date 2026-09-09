@@ -161,7 +161,7 @@ Client-side cryptography: key management and AES-256-GCM.
 ### Definition of Done
 - [x] Crypto foundation verified.
 - [x] All tests pass (incl. unit tests for crypto).
-- [ ] **USER APPROVAL** received.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -438,7 +438,7 @@ Finalize the project for submission.
 | 1 Foundation | [x] | [x] | [x] | [x] |
 | 2 Authentication | [x] | [x] | [x] | [x] |
 | 3 2FA & RBAC | [x] | [x] | [x] | [x] |
-| 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
+| 4 Crypto Foundation | [x] | [x] | [x] | [x] |
 | 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |
 | 6 Socket.IO Real-Time | [ ] | [ ] | [ ] | [ ] |
 | 7 Self-Destruct Engine | [ ] | [ ] | [ ] | [ ] |
