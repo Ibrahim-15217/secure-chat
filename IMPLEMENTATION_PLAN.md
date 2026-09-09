@@ -106,7 +106,7 @@ Secure registration and login.
 ### Definition of Done
 - [x] Auth flow works end-to-end.
 - [x] All tests pass.
-- [ ] **USER APPROVAL** received.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -436,7 +436,7 @@ Finalize the project for submission.
 | Phase | Status | Tests | User Approved | Committed |
 |-------|--------|-------|---------------|-----------|
 | 1 Foundation | [x] | [x] | [x] | [x] |
-| 2 Authentication | [ ] | [x] | [ ] | [ ] |
+| 2 Authentication | [x] | [x] | [x] | [x] |
 | 3 2FA & RBAC | [ ] | [ ] | [ ] | [ ] |
 | 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
 | 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |
