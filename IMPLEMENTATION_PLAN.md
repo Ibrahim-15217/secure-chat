@@ -171,25 +171,25 @@ Client-side cryptography: key management and AES-256-GCM.
 Encrypted one-to-one conversations (no real-time yet).
 
 ### Tasks
-- [ ] User search.
-- [ ] Conversation creation.
-- [ ] Message composer.
-- [ ] Message encryption on client.
-- [ ] Message storage (ciphertext only) in DB.
-- [ ] Message retrieval + decryption.
-- [ ] Message display.
-- [ ] Conversation membership checks.
+- [x] User search.
+- [x] Conversation creation.
+- [x] Message composer.
+- [x] Message encryption on client.
+- [x] Message storage (ciphertext only) in DB.
+- [x] Message retrieval + decryption.
+- [x] Message display.
+- [x] Conversation membership checks.
 
 ### Tests
-- [ ] User A → encrypted message → User B decrypts it.
-- [ ] Database stores ciphertext, not plaintext.
-- [ ] Both participants can access the conversation.
-- [ ] Unauthorized user cannot retrieve message.
+- [x] User A → encrypted message → User B decrypts it.
+- [x] Database stores ciphertext, not plaintext.
+- [x] Both participants can access the conversation.
+- [x] Unauthorized user cannot retrieve message.
 
 ### Definition of Done
-- [ ] One-to-one encrypted messaging works.
-- [ ] All tests pass.
-- [ ] **USER APPROVAL** received.
+- [x] One-to-one encrypted messaging works.
+- [x] All tests pass.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -439,7 +439,7 @@ Finalize the project for submission.
 | 2 Authentication | [x] | [x] | [x] | [x] |
 | 3 2FA & RBAC | [x] | [x] | [x] | [x] |
 | 4 Crypto Foundation | [x] | [x] | [x] | [x] |
-| 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |
+| 5 One-to-One Messaging | [x] | [x] | [x] | [x] |
 | 6 Socket.IO Real-Time | [ ] | [ ] | [ ] | [ ] |
 | 7 Self-Destruct Engine | [ ] | [ ] | [ ] | [ ] |
 | 8 Secure File Sharing | [ ] | [ ] | [ ] | [ ] |

@@ -17,6 +17,12 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <nav className="flex items-center gap-1 text-sm">
               <Link
+                to="/messages"
+                className="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white"
+              >
+                Messages
+              </Link>
+              <Link
                 to="/keys"
                 className="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white"
               >

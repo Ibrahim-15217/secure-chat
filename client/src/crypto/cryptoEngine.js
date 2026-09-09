@@ -64,6 +64,27 @@ export async function encryptMessage(plaintext, recipientPublicJwk) {
   }
 }
 
+export async function encryptMessageFor(plaintext, publicJwkList) {
+  const aesKey = await crypto.subtle.generateKey(AesKeyParams, true, ['encrypt', 'decrypt'])
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const encoded = new TextEncoder().encode(plaintext)
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, encoded)
+
+  const aesRaw = await crypto.subtle.exportKey('raw', aesKey)
+  const wrappedKeys = []
+  for (const jwk of publicJwkList) {
+    const publicKey = await importPublicKeyJwk(jwk)
+    const wrapped = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, aesRaw)
+    wrappedKeys.push(bytesToBase64(new Uint8Array(wrapped)))
+  }
+
+  return {
+    ciphertext: bytesToBase64(new Uint8Array(ciphertext)),
+    iv: bytesToBase64(iv),
+    wrappedKeys,
+  }
+}
+
 export async function decryptMessage(payload, privateKeyJwk) {
   const privateKey = await importPrivateKeyJwk(privateKeyJwk)
   const aesKeyRaw = await crypto.subtle.decrypt(
