@@ -143,25 +143,25 @@ Multi-factor authentication and role-based access control.
 Client-side cryptography: key management and AES-256-GCM.
 
 ### Tasks
-- [ ] Client crypto module (`client/src/crypto/`).
-- [ ] RSA/ECC key-pair generation + storage (per selected design).
-- [ ] Public-key registration/distribution.
-- [ ] AES-256-GCM encrypt/decrypt.
-- [ ] Nonce/IV generation.
-- [ ] Authentication-tag generation & verification.
-- [ ] Secure key handling (never send private keys).
+- [x] Client crypto module (`client/src/crypto/`).
+- [x] RSA/ECC key-pair generation + storage (per selected design).
+- [x] Public-key registration/distribution.
+- [x] AES-256-GCM encrypt/decrypt.
+- [x] Nonce/IV generation.
+- [x] Authentication-tag generation & verification.
+- [x] Secure key handling (never send private keys).
 
 ### Tests
-- [ ] Encrypt/decrypt round-trips correctly.
-- [ ] Modified ciphertext fails authentication.
-- [ ] Incorrect key fails to decrypt.
-- [ ] Plaintext is not sent to backend.
-- [ ] Private keys are not leaked.
+- [x] Encrypt/decrypt round-trips correctly.
+- [x] Modified ciphertext fails authentication.
+- [x] Incorrect key fails to decrypt.
+- [x] Plaintext is not sent to backend.
+- [x] Private keys are not leaked.
 
 ### Definition of Done
-- [ ] Crypto foundation verified.
-- [ ] All tests pass (incl. unit tests for crypto).
-- [ ] **USER APPROVAL** received.
+- [x] Crypto foundation verified.
+- [x] All tests pass (incl. unit tests for crypto).
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -438,7 +438,7 @@ Finalize the project for submission.
 | 1 Foundation | [x] | [x] | [x] | [x] |
 | 2 Authentication | [x] | [x] | [x] | [x] |
 | 3 2FA & RBAC | [x] | [x] | [x] | [x] |
-| 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
+| 4 Crypto Foundation | [x] | [x] | [x] | [x] |
 | 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |
 | 6 Socket.IO Real-Time | [ ] | [ ] | [ ] | [ ] |
 | 7 Self-Destruct Engine | [ ] | [ ] | [ ] | [ ] |

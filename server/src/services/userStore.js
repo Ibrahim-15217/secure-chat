@@ -36,6 +36,7 @@ function createUser({ name, email, passwordHash, role = 'user' }) {
     role,
     two_factor_enabled: false,
     totp_secret: null,
+    public_key: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     status: 'active',
