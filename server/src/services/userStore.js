@@ -26,21 +26,23 @@ function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
-function createUser({ name, email, passwordHash }) {
+function createUser({ name, email, passwordHash, role = 'user' }) {
   const users = readUsers();
   const user = {
     id: uuidv4(),
     name,
     email,
     password_hash: passwordHash,
-    role: 'user',
+    role,
+    two_factor_enabled: false,
+    totp_secret: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     status: 'active',
   };
   users.push(user);
   writeUsers(users);
-  return sanitize(user);
+  return user;
 }
 
 function findByEmail(email) {
@@ -51,10 +53,19 @@ function findById(id) {
   return readUsers().find((u) => u.id === id);
 }
 
+function updateUser(id, patch) {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  users[index] = { ...users[index], ...patch, updated_at: new Date().toISOString() };
+  writeUsers(users);
+  return users[index];
+}
+
 function sanitize(user) {
   if (!user) return null;
-  const { password_hash, ...safe } = user;
+  const { password_hash, totp_secret, ...safe } = user;
   return safe;
 }
 
-module.exports = { createUser, findByEmail, findById, hashToken };
+module.exports = { createUser, findByEmail, findById, updateUser, readUsers, sanitize, hashToken };

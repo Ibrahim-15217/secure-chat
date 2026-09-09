@@ -22,5 +22,10 @@ export const api = {
   getHealth: () => request('/health'),
   register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   login: (payload) => request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  verify2fa: (payload) => request('/auth/verify-2fa', { method: 'POST', body: JSON.stringify(payload) }),
+  setup2fa: () => request('/auth/setup-2fa', { method: 'POST' }),
+  enable2fa: (code) => request('/auth/enable-2fa', { method: 'POST', body: JSON.stringify({ code }) }),
+  disable2fa: (code) => request('/auth/disable-2fa', { method: 'POST', body: JSON.stringify({ code }) }),
   me: () => request('/auth/me'),
+  adminUsers: () => request('/admin/users'),
 }
