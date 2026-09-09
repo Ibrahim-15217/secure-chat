@@ -8,6 +8,9 @@ const routes = require('./routes');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const cryptoRoutes = require('./routes/crypto');
+const usersRoutes = require('./routes/users');
+const conversationsRoutes = require('./routes/conversations');
+const messagesRoutes = require('./routes/messages');
 
 const app = express();
 
@@ -23,6 +26,9 @@ app.use('/api', routes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/crypto', cryptoRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/conversations', conversationsRoutes);
+app.use('/api/messages', messagesRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
