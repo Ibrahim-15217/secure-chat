@@ -28,4 +28,8 @@ export const api = {
   disable2fa: (code) => request('/auth/disable-2fa', { method: 'POST', body: JSON.stringify({ code }) }),
   me: () => request('/auth/me'),
   adminUsers: () => request('/admin/users'),
+  setPublicKey: (publicJwk) =>
+    request('/crypto/public-key', { method: 'POST', body: JSON.stringify({ publicKey: publicJwk }) }),
+  getPublicKey: (userId) => request(`/crypto/public-key/${userId}`),
+  getMyPublicKey: () => request('/crypto/my-public-key'),
 }
