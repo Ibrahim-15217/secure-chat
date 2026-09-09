@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import AuthLayout from '../layouts/AuthLayout'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -15,7 +16,13 @@ export default function LoginPage() {
     setError('')
     setSubmitting(true)
     login(form)
-      .then(() => navigate('/dashboard'))
+      .then((result) => {
+        if (result.requiresTwoFactor) {
+          navigate('/verify-2fa', { state: { pendingToken: result.pendingToken } })
+        } else {
+          navigate(location.state?.from || '/dashboard')
+        }
+      })
       .catch((err) => setError(err.message))
       .finally(() => setSubmitting(false))
   }

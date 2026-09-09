@@ -1,6 +1,15 @@
 const express = require('express');
 
-const { register, login, getPublicUser, AuthError } = require('../services/authService');
+const {
+  register,
+  login,
+  verifyTwoFactor,
+  setupTwoFactor,
+  enableTwoFactor,
+  disableTwoFactor,
+  getPublicUser,
+  AuthError,
+} = require('../services/authService');
 const { requireAuth } = require('../middleware/auth');
 const { validateRegister, validateLogin } = require('../validators/auth');
 
@@ -35,6 +44,57 @@ router.post('/login', async (req, res) => {
   }
   try {
     const result = await login(value);
+    // If a pre-auth token was issued, the client must complete TOTP verification.
+    if (result.requiresTwoFactor) {
+      return res.status(200).json({
+        requiresTwoFactor: true,
+        pendingToken: result.pendingToken,
+        user: result.user,
+      });
+    }
+    return res.json(result);
+  } catch (err) {
+    return handleAuthError(res, err);
+  }
+});
+
+router.post('/verify-2fa', async (req, res) => {
+  const { pendingToken, code } = req.body || {};
+  if (!pendingToken) return res.status(400).json({ error: 'Missing pending token' });
+  if (!code) return res.status(400).json({ error: 'Verification code is required' });
+  try {
+    const result = await verifyTwoFactor({ pendingToken, code });
+    return res.json(result);
+  } catch (err) {
+    return handleAuthError(res, err);
+  }
+});
+
+router.post('/setup-2fa', requireAuth, (req, res) => {
+  try {
+    const result = setupTwoFactor(req.user.id);
+    return res.json(result);
+  } catch (err) {
+    return handleAuthError(res, err);
+  }
+});
+
+router.post('/enable-2fa', requireAuth, (req, res) => {
+  const { code } = req.body || {};
+  if (!code) return res.status(400).json({ error: 'Verification code is required' });
+  try {
+    const result = enableTwoFactor(req.user.id, { code });
+    return res.json(result);
+  } catch (err) {
+    return handleAuthError(res, err);
+  }
+});
+
+router.post('/disable-2fa', requireAuth, (req, res) => {
+  const { code } = req.body || {};
+  if (!code) return res.status(400).json({ error: 'Verification code is required' });
+  try {
+    const result = disableTwoFactor(req.user.id, { code });
     return res.json(result);
   } catch (err) {
     return handleAuthError(res, err);

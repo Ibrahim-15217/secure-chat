@@ -33,11 +33,22 @@ export function AuthProvider({ children }) {
   }, [token])
 
   const login = useCallback(async (credentials) => {
-    const { user: authedUser, token: newToken } = await api.login(credentials)
+    const result = await api.login(credentials)
+    if (result.requiresTwoFactor) {
+      return { requiresTwoFactor: true, pendingToken: result.pendingToken }
+    }
+    localStorage.setItem(TOKEN_KEY, result.token)
+    setToken(result.token)
+    setUser(result.user)
+    return { requiresTwoFactor: false, user: result.user }
+  }, [])
+
+  const verify2fa = useCallback(async (pendingToken, code) => {
+    const { user: verifiedUser, token: newToken } = await api.verify2fa({ pendingToken, code })
     localStorage.setItem(TOKEN_KEY, newToken)
     setToken(newToken)
-    setUser(authedUser)
-    return authedUser
+    setUser(verifiedUser)
+    return verifiedUser
   }, [])
 
   const register = useCallback(async (payload) => {
@@ -55,7 +66,9 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, setUser, token, loading, login, verify2fa, register, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )
