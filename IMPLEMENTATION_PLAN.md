@@ -86,27 +86,27 @@ Stand up the base project structure, version control, environment config, and co
 Secure registration and login.
 
 ### Tasks
-- [ ] Registration endpoint (validate input).
-- [ ] Argon2 password hashing (backend).
-- [ ] Login endpoint.
-- [ ] JWT issuing + validation.
-- [ ] Logout + token expiration handling.
-- [ ] Protected-route middleware (frontend + backend).
-- [ ] Registration page, Login page.
-- [ ] Failed-login handling.
+- [x] Registration endpoint (validate input).
+- [x] Argon2 password hashing (backend).
+- [x] Login endpoint.
+- [x] JWT issuing + validation.
+- [x] Logout + token expiration handling.
+- [x] Protected-route middleware (frontend + backend).
+- [x] Registration page, Login page.
+- [x] Failed-login handling.
 
 ### Tests
-- [ ] Correct credentials succeed.
-- [ ] Wrong password fails.
-- [ ] Password is never stored plaintext (check DB).
-- [ ] Expired JWT rejected.
-- [ ] Invalid JWT rejected.
-- [ ] Protected route blocks unauthenticated access.
+- [x] Correct credentials succeed.
+- [x] Wrong password fails.
+- [x] Password is never stored plaintext (check DB).
+- [x] Expired JWT rejected.
+- [x] Invalid JWT rejected.
+- [x] Protected route blocks unauthenticated access.
 
 ### Definition of Done
-- [ ] Auth flow works end-to-end.
-- [ ] All tests pass.
-- [ ] **USER APPROVAL** received.
+- [x] Auth flow works end-to-end.
+- [x] All tests pass.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -436,7 +436,7 @@ Finalize the project for submission.
 | Phase | Status | Tests | User Approved | Committed |
 |-------|--------|-------|---------------|-----------|
 | 1 Foundation | [x] | [x] | [x] | [x] |
-| 2 Authentication | [ ] | [ ] | [ ] | [ ] |
+| 2 Authentication | [x] | [x] | [x] | [x] |
 | 3 2FA & RBAC | [ ] | [ ] | [ ] | [ ] |
 | 4 Crypto Foundation | [ ] | [ ] | [ ] | [ ] |
 | 5 One-to-One Messaging | [ ] | [ ] | [ ] | [ ] |

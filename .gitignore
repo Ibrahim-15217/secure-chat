@@ -23,6 +23,9 @@ Thumbs.db
 # Supabase generated
 supabase/.temp/
 
+# Local dev data (JSON user store placeholder until Supabase)
+server/data/
+
 # Editor
 .vscode/
 .idea/
