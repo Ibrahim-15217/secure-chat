@@ -42,4 +42,32 @@ export const api = {
     request(`/conversations/${conversationId}/messages`, { method: 'POST', body: JSON.stringify(payload) }),
   markRead: (messageId) => request(`/messages/${messageId}/read`, { method: 'POST' }),
   deleteMessage: (messageId) => request(`/messages/${messageId}`, { method: 'DELETE' }),
+  listFiles: (conversationId) => request(`/files/conversation/${conversationId}`),
+  createFileMeta: (payload) => request('/files', { method: 'POST', body: JSON.stringify(payload) }),
+  uploadCiphertext: async (fileId, bytes) => {
+    const headers = {}
+    const token = localStorage.getItem('securechat_token')
+    if (token) headers.Authorization = `Bearer ${token}`
+    const res = await fetch(`${API_BASE_URL}/files/${fileId}/body`, {
+      method: 'PUT',
+      headers,
+      body: bytes,
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.error || `Upload failed with status ${res.status}`)
+    }
+    return res.json()
+  },
+  getFileMeta: (fileId) => request(`/files/${fileId}/meta`),
+  requestFileToken: (fileId) => request(`/files/${fileId}/token`),
+  downloadFile: async (fileId, token) => {
+    const res = await fetch(`${API_BASE_URL}/files/${fileId}/download?token=${encodeURIComponent(token)}`)
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.error || `Download failed with status ${res.status}`)
+    }
+    return res.arrayBuffer()
+  },
+  deleteFile: (fileId) => request(`/files/${fileId}`, { method: 'DELETE' }),
 }
