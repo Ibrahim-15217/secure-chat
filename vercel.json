@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rootDirectory": "client",
+  "framework": "vite",
+  "buildCommand": "npm install --no-audit --no-fund && npm run build",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" }
+  ]
+}
