@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { useKeypair } from '../hooks/useKeypair'
 import { api } from '../services/api'
+import { connectSocket, getSocket } from '../services/socket'
 import { decryptMessage, encryptMessageFor } from '../crypto/cryptoEngine'
 
 function decryptWith(message, myId, privateKeyJwk) {
@@ -14,7 +15,7 @@ function decryptWith(message, myId, privateKeyJwk) {
 }
 
 export default function MessagesPage() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const { keypair } = useKeypair(user?.id)
   const [searchParams] = useSearchParams()
   const [conversations, setConversations] = useState([])
@@ -23,7 +24,10 @@ export default function MessagesPage() {
   const [drafts, setDrafts] = useState({})
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [typingUser, setTypingUser] = useState(null)
   const bottomRef = useRef(null)
+  const typingSentRef = useRef(false)
+  const typingTimerRef = useRef(null)
 
   const selected = useMemo(
     () => conversations.find((c) => c.id === selectedId) || null,
@@ -79,7 +83,10 @@ export default function MessagesPage() {
 
         const unread = decrypted.filter((m) => m.recipient_id === user.id && !m.read_at)
         unread.forEach((m) => {
-          api.markRead(m.id).catch(() => {})
+          api
+            .markRead(m.id)
+            .then(() => getSocket()?.emit('message:read', { messageId: m.id }))
+            .catch(() => {})
         })
       } catch (err) {
         if (!cancelled) setError(err.message)
@@ -89,6 +96,62 @@ export default function MessagesPage() {
       cancelled = true
     }
   }, [selectedId, keypair, user])
+
+  const appendDecrypted = useCallback(
+    async (incoming) => {
+      if (!keypair || !selectedId || incoming.conversation_id !== selectedId) return false
+      try {
+        const text = await decryptWith(incoming, user.id, keypair.privateJwk)
+        setMessages((ms) => (ms.some((m) => m.id === incoming.id) ? ms : [...ms, { ...incoming, text }]))
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        return true
+      } catch {
+        return false
+      }
+    },
+    [keypair, selectedId, user]
+  )
+
+  useEffect(() => {
+    if (!token) return undefined
+    const socket = connectSocket(token)
+    const onNew = (data) => {
+      if (data && data.message) {
+        appendDecrypted(data.message).then((shown) => {
+          if (shown) refreshConversations()
+        })
+      }
+    }
+    const onRead = (data) => {
+      if (!data) return
+      setMessages((ms) => ms.map((m) => (m.id === data.messageId ? { ...m, read_at: data.readAt } : m)))
+    }
+    const onTypingStart = (data) => {
+      if (data && data.conversationId === selectedId) setTypingUser(true)
+    }
+    const onTypingStop = (data) => {
+      if (data && data.conversationId === selectedId) setTypingUser(false)
+    }
+    socket.on('message:new', onNew)
+    socket.on('message:read', onRead)
+    socket.on('typing:start', onTypingStart)
+    socket.on('typing:stop', onTypingStop)
+    return () => {
+      socket.off('message:new', onNew)
+      socket.off('message:read', onRead)
+      socket.off('typing:start', onTypingStart)
+      socket.off('typing:stop', onTypingStop)
+    }
+  }, [token, selectedId, appendDecrypted, refreshConversations, user])
+
+  useEffect(() => {
+    if (!token || !selectedId) return undefined
+    const socket = connectSocket(token)
+    socket.emit('conversation:join', { conversationId: selectedId })
+    return () => {
+      socket.emit('conversation:leave', { conversationId: selectedId })
+    }
+  }, [token, selectedId])
 
   async function sendMessage(e) {
     e.preventDefault()
@@ -106,6 +169,9 @@ export default function MessagesPage() {
         wrappedKey: payload.wrappedKeys[0],
         senderWrappedKey: payload.wrappedKeys[1],
       })
+      getSocket()?.emit('typing:stop', { conversationId: selected.id })
+      typingSentRef.current = false
+      setTypingUser(false)
       setDrafts((d) => ({ ...d, [selected.id]: '' }))
       const data = await api.listMessages(selected.id)
       const decrypted = await Promise.all(
@@ -134,6 +200,28 @@ export default function MessagesPage() {
       setMessages((ms) => ms.filter((m) => m.id !== messageId))
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  function emitTyping(conversationId) {
+    if (!getSocket() || !conversationId) return
+    if (!typingSentRef.current) {
+      typingSentRef.current = true
+      getSocket().emit('typing:start', { conversationId })
+    }
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
+    typingTimerRef.current = setTimeout(() => {
+      typingSentRef.current = false
+      getSocket().emit('typing:stop', { conversationId })
+    }, 1200)
+  }
+
+  function stopTyping(conversationId) {
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
+    typingTimerRef.current = null
+    if (typingSentRef.current) {
+      typingSentRef.current = false
+      getSocket()?.emit('typing:stop', { conversationId })
     }
   }
 
@@ -197,7 +285,13 @@ export default function MessagesPage() {
               <>
                 <div className="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
                   <div className="font-medium text-white">{selected.other_participant?.name}</div>
-                  <div className="text-xs text-slate-500">{selected.other_participant?.email}</div>
+                  <div className="text-xs text-slate-500">
+                    {typingUser ? (
+                      <span className="text-cyan-400">typing...</span>
+                    ) : (
+                      selected.other_participant?.email
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 max-h-[420px]">
@@ -235,7 +329,11 @@ export default function MessagesPage() {
                 <form onSubmit={sendMessage} className="border-t border-slate-800 p-4 flex gap-3">
                   <input
                     value={drafts[selected.id] || ''}
-                    onChange={(e) => setDrafts((d) => ({ ...d, [selected.id]: e.target.value }))}
+                    onChange={(e) => {
+                      setDrafts((d) => ({ ...d, [selected.id]: e.target.value }))
+                      emitTyping(selected.id)
+                    }}
+                    onBlur={() => stopTyping(selected.id)}
                     placeholder="Type a message... (encrypted before sending)"
                     className="flex-1 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />

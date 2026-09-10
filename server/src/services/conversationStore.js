@@ -39,10 +39,36 @@ function listMessagesFor(conversationId) {
     .map(sanitizeMessage);
 }
 
+function isParticipant(conversation, userId) {
+  return conversation && (conversation.user_one_id === userId || conversation.user_two_id === userId);
+}
+
+function createMessage(conversation, senderId, { ciphertext, iv, wrappedKey, senderWrappedKey }) {
+  const recipientId =
+    conversation.user_one_id === senderId ? conversation.user_two_id : conversation.user_one_id;
+  const authTag = Buffer.from(String(ciphertext), 'base64').slice(-16).toString('base64');
+  return messages.insert({
+    conversation_id: conversation.id,
+    sender_id: senderId,
+    recipient_id: recipientId,
+    ciphertext: String(ciphertext),
+    nonce: String(iv),
+    auth_tag: authTag,
+    encrypted_key_reference: String(wrappedKey),
+    sender_key_reference: String(senderWrappedKey),
+    expiry_type: null,
+    expires_at: null,
+    read_at: null,
+    status: 'sent',
+  });
+}
+
 module.exports = {
   conversations,
   messages,
   findOrCreateConversation,
   listConversationsFor,
   listMessagesFor,
+  createMessage,
+  isParticipant,
 };

@@ -199,22 +199,22 @@ Encrypted one-to-one conversations (no real-time yet).
 Real-time delivery with authenticated connections and conversation isolation.
 
 ### Tasks
-- [ ] Socket connection + JWT handshake auth.
-- [ ] Conversation rooms.
-- [ ] Message event flow (send/new/delivered/read).
-- [ ] Typing indicators.
-- [ ] Disconnect + reconnection handling.
-- [ ] Server-side room authorization.
+- [x] Socket connection + JWT handshake auth.
+- [x] Conversation rooms.
+- [x] Message event flow (send/new/delivered/read).
+- [x] Typing indicators.
+- [x] Disconnect + reconnection handling.
+- [x] Server-side room authorization.
 
 ### Tests
-- [ ] Message appears in real time.
-- [ ] Unauthenticated socket rejected.
-- [ ] User cannot join unauthorized room.
-- [ ] Conversation events do not leak to other users.
+- [x] Message appears in real time.
+- [x] Unauthenticated socket rejected.
+- [x] User cannot join unauthorized room.
+- [x] Conversation events do not leak to other users.
 
 ### Definition of Done
-- [ ] Real-time layer works and is isolated.
-- [ ] All tests pass.
+- [x] Real-time layer works and is isolated.
+- [x] All tests pass.
 - [ ] **USER APPROVAL** received.
 
 ---
