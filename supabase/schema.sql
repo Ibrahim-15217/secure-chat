@@ -1,6 +1,6 @@
-# Supabase production schema + RLS for Secure Chat.
-# Copy the model used by the local JSON store (server/src/services/*).
-# Apply in the Supabase SQL editor after creating the production project.
+﻿--  Supabase production schema + RLS for Secure Chat.
+--  Copy the model used by the local JSON store (server/src/services/*).
+--  Apply in the Supabase SQL editor after creating the production project.
 
 -- Users table (id is a UUID matching JWT sub claim)
 create extension if not exists "pgcrypto";
