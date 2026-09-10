@@ -279,19 +279,19 @@ Encrypted file sharing with time-limited access.
 Administrative monitoring and user management.
 
 ### Tasks
-- [ ] Admin login (strong auth).
-- [ ] User list + status management.
-- [ ] Audit logs view.
-- [ ] Security events + failed-login monitoring.
-- [ ] System statistics.
+- [x] Admin login (strong auth).
+- [x] User list + status management.
+- [x] Audit logs view.
+- [x] Security events + failed-login monitoring.
+- [x] System statistics.
 
 ### Note
 Admin must **not** receive plaintext message content.
 
 ### Tests
-- [ ] Admin can manage users.
-- [ ] Non-admin blocked.
-- [ ] Audit logs contain no plaintext messages.
+- [x] Admin can manage users.
+- [x] Non-admin blocked.
+- [x] Audit logs contain no plaintext messages.
 
 ### Definition of Done
 - [ ] Admin dashboard works.

@@ -28,6 +28,13 @@ export const api = {
   disable2fa: (code) => request('/auth/disable-2fa', { method: 'POST', body: JSON.stringify({ code }) }),
   me: () => request('/auth/me'),
   adminUsers: () => request('/admin/users'),
+  adminUpdateUser: (id, patch) => request(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  adminAuditLogs: (params = {}) => {
+    const q = new URLSearchParams(params).toString()
+    return request(`/admin/audit-logs${q ? `?${q}` : ''}`)
+  },
+  adminSecurityEvents: () => request('/admin/security-events'),
+  adminStats: () => request('/admin/stats'),
   setPublicKey: (publicJwk) =>
     request('/crypto/public-key', { method: 'POST', body: JSON.stringify({ publicKey: publicJwk }) }),
   getPublicKey: (userId) => request(`/crypto/public-key/${userId}`),
