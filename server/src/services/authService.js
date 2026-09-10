@@ -74,7 +74,7 @@ async function login({ email, password }) {
 
 function verifyToken(token) {
   try {
-    const payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, config.jwt.secret, { algorithms: ['HS256'] });
     if (payload.preauth) return null;
     return payload;
   } catch (err) {
@@ -84,7 +84,7 @@ function verifyToken(token) {
 
 function verifyPreAuthToken(token) {
   try {
-    const payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, config.jwt.secret, { algorithms: ['HS256'] });
     return payload && payload.preauth === true ? payload : null;
   } catch (err) {
     return null;

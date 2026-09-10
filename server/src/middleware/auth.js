@@ -1,4 +1,5 @@
 const { verifyToken } = require('../services/authService');
+const { findById } = require('../services/userStore');
 
 function extractToken(req) {
   const header = req.headers.authorization || '';
@@ -12,7 +13,12 @@ function requireAuth(req, res, next) {
   if (!payload) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-  req.user = { id: payload.sub, role: payload.role, email: payload.email };
+  const user = findById(payload.sub);
+  if (!user) return res.status(401).json({ error: 'Authentication required' });
+  if (user.status !== 'active') {
+    return res.status(403).json({ error: 'Account is suspended or banned' });
+  }
+  req.user = { id: payload.sub, role: user.role, email: user.email };
   return next();
 }
 
