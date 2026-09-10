@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const { createUser, findByEmail, findById, updateUser, sanitize } = require('./userStore');
 const { encrypt, decrypt } = require('../utils/secretCrypto');
+const { logAudit } = require('./auditLogStore');
 const totp = require('./totpService');
 
 class AuthError extends Error {
@@ -41,6 +42,7 @@ async function register({ name, email, password, role = 'user' }) {
 async function login({ email, password }) {
   const user = findByEmail(email);
   if (!user) {
+    logAudit({ event_type: 'auth', action: 'login_failed', success: false, detail: { email, reason: 'unknown_email' } });
     // Generic message: do not reveal whether the email exists.
     throw new AuthError('Invalid credentials');
   }
@@ -51,7 +53,12 @@ async function login({ email, password }) {
   } catch (err) {
     valid = false;
   }
-  if (!valid) throw new AuthError('Invalid credentials');
+  if (!valid) {
+    logAudit({ user_id: user.id, event_type: 'auth', action: 'login_failed', success: false, detail: { email, reason: 'bad_password' } });
+    throw new AuthError('Invalid credentials');
+  }
+
+  logAudit({ user_id: user.id, event_type: 'auth', action: 'login_success', success: true, detail: { email } });
 
   if (user.two_factor_enabled) {
     return {
@@ -91,9 +98,11 @@ async function verifyTwoFactor({ pendingToken, code }) {
 
   const secret = decrypt(user.totp_secret);
   if (!totp.verifyCode(secret, String(code).trim())) {
+    logAudit({ user_id: user.id, event_type: 'auth', action: 'two_factor_failed', success: false, detail: { email: user.email } });
     throw new AuthError('Invalid verification code');
   }
 
+  logAudit({ user_id: user.id, event_type: 'auth', action: 'two_factor_success', success: true, detail: { email: user.email } });
   const token = signToken(user);
   return { user: sanitize(user), token };
 }
