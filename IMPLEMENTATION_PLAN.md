@@ -215,7 +215,7 @@ Real-time delivery with authenticated connections and conversation isolation.
 ### Definition of Done
 - [x] Real-time layer works and is isolated.
 - [x] All tests pass.
-- [ ] **USER APPROVAL** received.
+- [x] **USER APPROVAL** received.
 
 ---
 
@@ -440,7 +440,7 @@ Finalize the project for submission.
 | 3 2FA & RBAC | [x] | [x] | [x] | [x] |
 | 4 Crypto Foundation | [x] | [x] | [x] | [x] |
 | 5 One-to-One Messaging | [x] | [x] | [x] | [x] |
-| 6 Socket.IO Real-Time | [ ] | [ ] | [ ] | [ ] |
+| 6 Socket.IO Real-Time | [x] | [x] | [x] | [x] |
 | 7 Self-Destruct Engine | [ ] | [ ] | [ ] | [ ] |
 | 8 Secure File Sharing | [ ] | [ ] | [ ] | [ ] |
 | 9 Admin Dashboard | [ ] | [ ] | [ ] | [ ] |
