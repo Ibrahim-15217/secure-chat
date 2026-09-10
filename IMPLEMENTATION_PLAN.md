@@ -342,36 +342,36 @@ Comprehensive unit, integration, security, and performance testing.
 
 ### Tests
 #### Unit
-- [ ] Encryption functions.
-- [ ] Decryption functions.
-- [ ] Authentication functions.
-- [ ] Expiry calculations.
-- [ ] Validators.
+- [x] Encryption functions.
+- [x] Decryption functions.
+- [x] Authentication functions.
+- [x] Expiry calculations.
+- [x] Validators.
 
 #### Integration
-- [ ] Frontend → backend.
-- [ ] Backend → database.
-- [ ] Backend → storage.
-- [ ] Backend → Socket.IO.
+- [x] Frontend → backend.
+- [x] Backend → database.
+- [x] Backend → storage.
+- [x] Backend → Socket.IO.
 
 #### Security
-- [ ] Broken access control.
-- [ ] Authentication bypass.
-- [ ] SQL/injection attempts.
-- [ ] JWT manipulation.
-- [ ] Unauthorized socket access.
-- [ ] Unauthorized file access.
-- [ ] Expired-file access.
-- [ ] Ciphertext tampering.
-- [ ] Self-destruct recovery (forensic).
+- [x] Broken access control.
+- [x] Authentication bypass.
+- [x] SQL/injection attempts.
+- [x] JWT manipulation.
+- [x] Unauthorized socket access.
+- [x] Unauthorized file access.
+- [x] Expired-file access.
+- [x] Ciphertext tampering.
+- [x] Self-destruct recovery (forensic).
 
 #### Performance
-- [ ] Normal message delivery time.
-- [ ] Encryption overhead.
-- [ ] Decryption overhead.
-- [ ] Self-destruct processing delay.
-- [ ] Socket latency.
-- [ ] Compare against unencrypted baseline (target: < 500 ms overhead).
+- [x] Normal message delivery time.
+- [x] Encryption overhead.
+- [x] Decryption overhead.
+- [x] Self-destruct processing delay.
+- [x] Socket latency.
+- [x] Compare against unencrypted baseline (target: < 500 ms overhead).
 
 ### Definition of Done
 - [ ] All test suites pass.
