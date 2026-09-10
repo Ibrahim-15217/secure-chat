@@ -4,9 +4,11 @@ const http = require('http');
 const app = require('./app');
 const config = require('./config');
 const { attachRealtime } = require('./realtime/socket');
+const { startExpiryWorker } = require('./services/expiryWorker');
 
 const httpServer = http.createServer(app);
-attachRealtime(httpServer);
+const io = attachRealtime(httpServer);
+startExpiryWorker(io);
 
 httpServer.listen(config.port, () => {
   // eslint-disable-next-line no-console

@@ -41,9 +41,14 @@ function attachRealtime(httpServer) {
         if (typeof ack === 'function') ack({ error: 'Forbidden' });
         return;
       }
-      const { ciphertext, iv, wrappedKey, senderWrappedKey } = payload || {};
+      const { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration } = payload || {};
       if (!ciphertext || !iv || !wrappedKey || !senderWrappedKey) {
         if (typeof ack === 'function') ack({ error: 'ciphertext, iv, wrappedKey and senderWrappedKey are required' });
+        return;
+      }
+      const expiry = conversationStore.validateExpiry(expiryType, expiryDuration);
+      if (!expiry.ok) {
+        if (typeof ack === 'function') ack({ error: expiry.error });
         return;
       }
       const message = conversationStore.createMessage(conversation, userId, {
@@ -51,25 +56,32 @@ function attachRealtime(httpServer) {
         iv,
         wrappedKey,
         senderWrappedKey,
+        expiryType,
+        expiryDuration,
       });
       io.to(`conversation:${conversation.id}`).emit('message:new', { message });
       if (typeof ack === 'function') ack({ ok: true, message });
     });
 
     socket.on('message:read', ({ messageId } = {}, ack) => {
-      const message = conversationStore.messages.findById(messageId);
-      if (!message || !conversationStore.isParticipant(conversationStore.conversations.findById(message.conversation_id), userId)) {
+      const result = conversationStore.markRead(messageId, userId);
+      if (result.status === 'not_found') {
         if (typeof ack === 'function') ack({ error: 'Forbidden' });
         return;
       }
-      if (message.recipient_id !== userId) {
+      if (result.status === 'forbidden') {
         if (typeof ack === 'function') ack({ error: 'Only the recipient can mark as read' });
         return;
       }
-      const updated = message.read_at
-        ? message
-        : conversationStore.messages.update(message.id, { read_at: new Date().toISOString() });
-      io.to(`conversation:${message.conversation_id}`).emit('message:read', { messageId: message.id, readAt: updated.read_at });
+      const updated = result.message;
+      if (result.status === 'ok') {
+        io.to(`conversation:${updated.conversation_id}`).emit('message:read', {
+          messageId: updated.id,
+          readAt: updated.read_at,
+          expiresAt: updated.expires_at,
+          expiryDuration: updated.expiry_duration,
+        });
+      }
       if (typeof ack === 'function') ack({ ok: true });
     });
 

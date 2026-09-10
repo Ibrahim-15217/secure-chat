@@ -48,16 +48,20 @@ router.post('/:id/messages', (req, res) => {
     return res.status(404).json({ error: 'Conversation not found' });
   }
 
-  const { ciphertext, iv, wrappedKey, senderWrappedKey } = req.body || {};
+  const { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration } = req.body || {};
   if (!ciphertext || !iv || !wrappedKey || !senderWrappedKey) {
     return res.status(400).json({ error: 'ciphertext, iv, wrappedKey and senderWrappedKey are required' });
   }
+  const expiry = conversationStore.validateExpiry(expiryType, expiryDuration);
+  if (!expiry.ok) return res.status(400).json({ error: expiry.error });
 
   const message = conversationStore.createMessage(conversation, req.user.id, {
     ciphertext,
     iv,
     wrappedKey,
     senderWrappedKey,
+    expiryType,
+    expiryDuration,
   });
 
   conversationStore.conversations.update(conversation.id, {});
