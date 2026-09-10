@@ -6,18 +6,18 @@ function cleanEmail(value) {
 
 function validateRegister(body) {
   const errors = [];
-  const name = String(body.name || '').trim().slice(0, 100);
-  const email = cleanEmail(body.email).slice(0, 254);
+  const rawName = String(body.name || '').trim();
+  const rawEmail = cleanEmail(body.email);
   const password = String(body.password || '');
 
-  if (!name) errors.push('Name is required');
-  if (name.length > 100) errors.push('Name must be at most 100 characters');
-  if (!EMAIL_RE.test(email)) errors.push('A valid email is required');
-  if (email.length > 254) errors.push('Email must be at most 254 characters');
+  if (!rawName) errors.push('Name is required');
+  if (rawName.length > 100) errors.push('Name must be at most 100 characters');
+  if (rawEmail.length > 254) errors.push('Email must be at most 254 characters');
+  if (!EMAIL_RE.test(rawEmail)) errors.push('A valid email is required');
   if (password.length < 8) errors.push('Password must be at least 8 characters');
   if (password.length > 128) errors.push('Password must be at most 128 characters');
 
-  return { errors, value: { name, email, password } };
+  return { errors, value: { name: rawName.slice(0, 100), email: rawEmail.slice(0, 254), password } };
 }
 
 function validateLogin(body) {
