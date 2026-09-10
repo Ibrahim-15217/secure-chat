@@ -43,10 +43,34 @@ function isParticipant(conversation, userId) {
   return conversation && (conversation.user_one_id === userId || conversation.user_two_id === userId);
 }
 
-function createMessage(conversation, senderId, { ciphertext, iv, wrappedKey, senderWrappedKey }) {
+const MAX_EXPIRY_SECONDS = 604800;
+
+function validateExpiry(expiryType, expiryDuration) {
+  if (expiryType === undefined && expiryDuration === undefined) return { ok: true };
+  if (expiryType !== 'time' && expiryType !== 'read') {
+    return { error: 'expiryType must be "time" or "read"' };
+  }
+  const duration = Number(expiryDuration);
+  if (!Number.isInteger(duration) || duration < 1 || duration > MAX_EXPIRY_SECONDS) {
+    return { error: `expiryDuration must be an integer between 1 and ${MAX_EXPIRY_SECONDS} seconds` };
+  }
+  return { ok: true, type: expiryType, duration };
+}
+
+function createMessage(
+  conversation,
+  senderId,
+  { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration }
+) {
   const recipientId =
     conversation.user_one_id === senderId ? conversation.user_two_id : conversation.user_one_id;
   const authTag = Buffer.from(String(ciphertext), 'base64').slice(-16).toString('base64');
+  const exp = validateExpiry(expiryType, expiryDuration);
+  const type = exp.ok ? exp.type : null;
+  const duration = exp.ok ? exp.duration : null;
+  const sentAt = new Date();
+  const expiresAt =
+    type === 'time' ? new Date(sentAt.getTime() + duration * 1000).toISOString() : null;
   return messages.insert({
     conversation_id: conversation.id,
     sender_id: senderId,
@@ -56,11 +80,30 @@ function createMessage(conversation, senderId, { ciphertext, iv, wrappedKey, sen
     auth_tag: authTag,
     encrypted_key_reference: String(wrappedKey),
     sender_key_reference: String(senderWrappedKey),
-    expiry_type: null,
-    expires_at: null,
+    expiry_type: type,
+    expiry_duration: duration,
+    expires_at: expiresAt,
     read_at: null,
+    created_at: sentAt.toISOString(),
+    updated_at: sentAt.toISOString(),
     status: 'sent',
   });
+}
+
+function markRead(messageId, readerId) {
+  const message = messages.findById(messageId);
+  if (!message) return { status: 'not_found' };
+  const conversation = conversations.findById(message.conversation_id);
+  if (!isParticipant(conversation, readerId)) return { status: 'not_found' };
+  if (message.recipient_id !== readerId) return { status: 'forbidden' };
+  if (message.read_at) return { status: 'already', message };
+  const readAt = new Date();
+  const patch = { read_at: readAt.toISOString() };
+  if (message.expiry_type === 'read' && message.expiry_duration) {
+    patch.expires_at = new Date(readAt.getTime() + message.expiry_duration * 1000).toISOString();
+  }
+  const updated = messages.update(message.id, patch);
+  return { status: 'ok', message: updated };
 }
 
 module.exports = {
@@ -71,4 +114,6 @@ module.exports = {
   listMessagesFor,
   createMessage,
   isParticipant,
+  validateExpiry,
+  markRead,
 };

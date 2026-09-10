@@ -16,18 +16,12 @@ function canAccessMessage(message, userId) {
 }
 
 router.post('/:id/read', (req, res) => {
-  const message = conversationStore.messages.findById(req.params.id);
-  if (!message || !canAccessMessage(message, req.user.id)) {
-    return res.status(404).json({ error: 'Message not found' });
-  }
-  if (message.recipient_id !== req.user.id) {
+  const result = conversationStore.markRead(req.params.id, req.user.id);
+  if (result.status === 'not_found') return res.status(404).json({ error: 'Message not found' });
+  if (result.status === 'forbidden') {
     return res.status(403).json({ error: 'Only the recipient can mark a message as read' });
   }
-  if (message.read_at) {
-    return res.json({ message });
-  }
-  const updated = conversationStore.messages.update(message.id, { read_at: new Date().toISOString() });
-  return res.json({ message: updated });
+  return res.json({ message: result.message });
 });
 
 router.delete('/:id', (req, res) => {
