@@ -11,6 +11,7 @@ const cryptoRoutes = require('./routes/crypto');
 const usersRoutes = require('./routes/users');
 const conversationsRoutes = require('./routes/conversations');
 const messagesRoutes = require('./routes/messages');
+const filesRoutes = require('./routes/files');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/crypto', cryptoRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/conversations', conversationsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/files', filesRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });

@@ -253,18 +253,18 @@ The core feature: timer-based and read-based self-destruction with coordinated p
 Encrypted file sharing with time-limited access.
 
 ### Tasks
-- [ ] File selection + client-side encryption.
-- [ ] Encrypted upload to Supabase Storage (ciphertext only).
-- [ ] File metadata storage.
-- [ ] Recipient authorization.
-- [ ] Time-limited access / temporary download URLs.
-- [ ] Client-side decryption + open file.
+- [x] File selection + client-side encryption.
+- [x] Encrypted upload to storage (ciphertext only).
+- [x] File metadata storage.
+- [x] Recipient authorization.
+- [x] Time-limited access / temporary download URLs.
+- [x] Client-side decryption + open file.
 
 ### Tests
-- [ ] Storage contains ciphertext (no plaintext files).
-- [ ] Unauthorized user cannot download.
-- [ ] Expired access is rejected.
-- [ ] Authorized recipient can decrypt the file.
+- [x] Storage contains ciphertext (no plaintext files).
+- [x] Unauthorized user cannot download.
+- [x] Expired access is rejected.
+- [x] Authorized recipient can decrypt the file.
 
 ### Definition of Done
 - [ ] Encrypted file sharing works.
