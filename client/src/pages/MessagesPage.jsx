@@ -4,7 +4,7 @@ import { useAuth } from '../context/useAuth'
 import { useKeypair } from '../hooks/useKeypair'
 import { api } from '../services/api'
 import { connectSocket, getSocket } from '../services/socket'
-import { decryptMessage, encryptMessageFor } from '../crypto/cryptoEngine'
+import { decryptFile, decryptMessage, encryptFile, encryptMessageFor } from '../crypto/cryptoEngine'
 
 function decryptWith(message, myId, privateKeyJwk) {
   const wrappedKey = message.sender_id === myId ? message.sender_key_reference : message.encrypted_key_reference
@@ -38,6 +38,9 @@ export default function MessagesPage() {
   const typingTimerRef = useRef(null)
   const [expirySelect, setExpirySelect] = useState('')
   const [now, setNow] = useState(0)
+  const [files, setFiles] = useState([])
+  const [fileBusy, setFileBusy] = useState(false)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,6 +92,94 @@ export default function MessagesPage() {
       cancelled = true
     }
   }, [user, selectedId])
+
+  useEffect(() => {
+    if (!selectedId) return undefined
+    let cancelled = false
+    ;(async () => {
+      try {
+        const data = await api.listFiles(selectedId)
+        if (!cancelled) setFiles(data.files || [])
+      } catch (err) {
+        if (!cancelled) setError(err.message)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [selectedId])
+
+  const refreshFiles = useCallback(async () => {
+    if (!selectedId) return
+    try {
+      const data = await api.listFiles(selectedId)
+      setFiles(data.files || [])
+    } catch (err) {
+      setError(err.message)
+    }
+  }, [selectedId])
+
+  async function handleFileSelected(e) {
+    const input = e.target
+    const raw = input.files && input.files[0]
+    input.value = ''
+    if (!raw || !selected || !keypair) return
+    setFileBusy(true)
+    try {
+      const bytesArrayBuffer = await raw.arrayBuffer()
+      const bytes = new Uint8Array(bytesArrayBuffer)
+      const recipientPub = await api.getPublicKey(selected.other_participant_id)
+      const enc = await encryptFile(bytes, [recipientPub.publicKey, keypair.publicJwk])
+      const meta = await api.createFileMeta({
+        conversationId: selected.id,
+        name: raw.name,
+        mime: raw.type,
+        size: enc.cipherBytes.length,
+        iv: enc.iv,
+        authTag: enc.authTag,
+        wrappedKey: enc.wrappedKey,
+        senderWrappedKey: enc.senderWrappedKey,
+        accessWindowSeconds: 900,
+      })
+      await api.uploadCiphertext(meta.file.id, enc.cipherBytes)
+      await refreshFiles()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setFileBusy(false)
+    }
+  }
+
+  async function downloadFile(file) {
+    if (!keypair) return
+    setFileBusy(true)
+    try {
+      const wrappedKey = file.sender_id === user.id ? file.sender_key_reference : file.encrypted_key_reference
+      const { token } = await api.requestFileToken(file.id)
+      const cipherBytes = new Uint8Array(await api.downloadFile(file.id, token))
+      const plain = await decryptFile(cipherBytes, { iv: file.iv, wrappedKey }, keypair.privateJwk)
+      const blob = new Blob([plain], { type: file.mime })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = file.name
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 4000)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setFileBusy(false)
+    }
+  }
+
+  async function removeFile(fileId) {
+    try {
+      await api.deleteFile(fileId)
+      await refreshFiles()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
   useEffect(() => {
     if (!selectedId || !keypair) return undefined
@@ -351,6 +442,42 @@ export default function MessagesPage() {
                   </div>
                 </div>
 
+                {files.length > 0 && (
+                  <div className="border-b border-slate-800 px-5 py-2 space-y-1 max-h-32 overflow-y-auto">
+                    <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Shared files</div>
+                    {files.map((f) => (
+                      <div key={f.id} className="flex items-center gap-3 text-sm">
+                        <span className="text-cyan-300 truncate">{f.name}</span>
+                        <span className="text-[11px] text-slate-500">{(f.size / 1024).toFixed(1)} KB</span>
+                        {f.status === 'ready' ? (
+                          <>
+                            <button
+                              type="button"
+                              disabled={fileBusy}
+                              onClick={() => downloadFile(f)}
+                              className="text-xs text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                            >
+                              download
+                            </button>
+                            <span className="text-[10px] text-slate-600">
+                              expires {new Date(f.expires_at).toLocaleTimeString()}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeFile(f.id)}
+                              className="text-xs text-slate-600 hover:text-red-400 ml-auto"
+                            >
+                              x
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-[11px] text-amber-500">encrypting...</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 max-h-[420px]">
                   {messages.length === 0 && (
                     <div className="text-sm text-slate-500 mt-8 text-center">No messages yet. Send the first one.</div>
@@ -403,6 +530,16 @@ export default function MessagesPage() {
                     <option value="read:60">Read · 1m</option>
                     <option value="read:300">Read · 5m</option>
                   </select>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={fileBusy}
+                    title="Share an encrypted file"
+                    className="px-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-sm disabled:opacity-50"
+                  >
+                    {fileBusy ? '...' : '+f'}
+                  </button>
+                  <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
                   <input
                     value={drafts[selected.id] || ''}
                     onChange={(e) => {
