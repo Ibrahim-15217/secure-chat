@@ -7,10 +7,6 @@ const router = express.Router();
 
 router.use(requireAuth);
 
-function isParticipant(conversation, userId) {
-  return conversation && (conversation.user_one_id === userId || conversation.user_two_id === userId);
-}
-
 router.post('/', (req, res) => {
   const { participantId } = req.body || {};
   if (!participantId) return res.status(400).json({ error: 'participantId is required' });
@@ -40,7 +36,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const conversation = conversationStore.conversations.findById(req.params.id);
-  if (!conversation || !isParticipant(conversation, req.user.id)) {
+  if (!conversation || !conversationStore.isParticipant(conversation, req.user.id)) {
     return res.status(404).json({ error: 'Conversation not found' });
   }
   return res.json({ conversation });
@@ -48,7 +44,7 @@ router.get('/:id', (req, res) => {
 
 router.post('/:id/messages', (req, res) => {
   const conversation = conversationStore.conversations.findById(req.params.id);
-  if (!conversation || !isParticipant(conversation, req.user.id)) {
+  if (!conversation || !conversationStore.isParticipant(conversation, req.user.id)) {
     return res.status(404).json({ error: 'Conversation not found' });
   }
 
@@ -57,24 +53,11 @@ router.post('/:id/messages', (req, res) => {
     return res.status(400).json({ error: 'ciphertext, iv, wrappedKey and senderWrappedKey are required' });
   }
 
-  const recipientId =
-    conversation.user_one_id === req.user.id ? conversation.user_two_id : conversation.user_one_id;
-
-  const authTag = Buffer.from(String(ciphertext), 'base64').slice(-16).toString('base64');
-
-  const message = conversationStore.messages.insert({
-    conversation_id: conversation.id,
-    sender_id: req.user.id,
-    recipient_id: recipientId,
-    ciphertext: String(ciphertext),
-    nonce: String(iv),
-    auth_tag: authTag,
-    encrypted_key_reference: String(wrappedKey),
-    sender_key_reference: String(senderWrappedKey),
-    expiry_type: null,
-    expires_at: null,
-    read_at: null,
-    status: 'sent',
+  const message = conversationStore.createMessage(conversation, req.user.id, {
+    ciphertext,
+    iv,
+    wrappedKey,
+    senderWrappedKey,
   });
 
   conversationStore.conversations.update(conversation.id, {});
@@ -83,7 +66,7 @@ router.post('/:id/messages', (req, res) => {
 
 router.get('/:id/messages', (req, res) => {
   const conversation = conversationStore.conversations.findById(req.params.id);
-  if (!conversation || !isParticipant(conversation, req.user.id)) {
+  if (!conversation || !conversationStore.isParticipant(conversation, req.user.id)) {
     return res.status(404).json({ error: 'Conversation not found' });
   }
   return res.json({ messages: conversationStore.listMessagesFor(conversation.id) });
