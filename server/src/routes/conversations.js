@@ -2,6 +2,8 @@ const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const userStore = require('../services/userStore');
 const conversationStore = require('../services/conversationStore');
+const { validateMessageBody } = require('../validators/messages');
+const { messageLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
@@ -42,16 +44,15 @@ router.get('/:id', (req, res) => {
   return res.json({ conversation });
 });
 
-router.post('/:id/messages', (req, res) => {
+router.post('/:id/messages', messageLimiter, (req, res) => {
   const conversation = conversationStore.conversations.findById(req.params.id);
   if (!conversation || !conversationStore.isParticipant(conversation, req.user.id)) {
     return res.status(404).json({ error: 'Conversation not found' });
   }
 
-  const { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration } = req.body || {};
-  if (!ciphertext || !iv || !wrappedKey || !senderWrappedKey) {
-    return res.status(400).json({ error: 'ciphertext, iv, wrappedKey and senderWrappedKey are required' });
-  }
+  const { errors, value: bodyValue } = validateMessageBody(req.body);
+  if (errors.length > 0) return res.status(400).json({ error: errors.join('; ') });
+  const { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration } = bodyValue;
   const expiry = conversationStore.validateExpiry(expiryType, expiryDuration);
   if (!expiry.ok) return res.status(400).json({ error: expiry.error });
 

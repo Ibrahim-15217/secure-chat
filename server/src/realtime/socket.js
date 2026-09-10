@@ -1,11 +1,14 @@
 const { Server } = require('socket.io');
 const { verifyToken } = require('../services/authService');
+const { findById } = require('../services/userStore');
 const conversationStore = require('../services/conversationStore');
+const config = require('../config');
+const { validateMessageBody } = require('../validators/messages');
 
 function attachRealtime(httpServer) {
   const io = new Server(httpServer, {
     cors: {
-      origin: true,
+      origin: config.clientUrl,
       credentials: true,
     },
   });
@@ -14,7 +17,9 @@ function attachRealtime(httpServer) {
     const token = socket.handshake.auth && socket.handshake.auth.token;
     const payload = token ? verifyToken(token) : null;
     if (!payload) return next(new Error('Unauthorized'));
-    socket.user = { id: payload.sub, role: payload.role, email: payload.email };
+    const user = findById(payload.sub);
+    if (!user || user.status !== 'active') return next(new Error('Unauthorized'));
+    socket.user = { id: user.id, role: user.role, email: user.email };
     return next();
   });
 
@@ -41,12 +46,13 @@ function attachRealtime(httpServer) {
         if (typeof ack === 'function') ack({ error: 'Forbidden' });
         return;
       }
-      const { ciphertext, iv, wrappedKey, senderWrappedKey, expiryType, expiryDuration } = payload || {};
-      if (!ciphertext || !iv || !wrappedKey || !senderWrappedKey) {
-        if (typeof ack === 'function') ack({ error: 'ciphertext, iv, wrappedKey and senderWrappedKey are required' });
+      const { errors } = validateMessageBody(payload);
+      if (errors.length > 0) {
+        if (typeof ack === 'function') ack({ error: errors.join('; ') });
         return;
       }
-      const expiry = conversationStore.validateExpiry(expiryType, expiryDuration);
+      const { ciphertext, iv, wrappedKey, senderWrappedKey } = payload;
+      const expiry = conversationStore.validateExpiry(payload.expiryType, payload.expiryDuration);
       if (!expiry.ok) {
         if (typeof ack === 'function') ack({ error: expiry.error });
         return;
@@ -56,8 +62,8 @@ function attachRealtime(httpServer) {
         iv,
         wrappedKey,
         senderWrappedKey,
-        expiryType,
-        expiryDuration,
+        expiryType: payload.expiryType,
+        expiryDuration: payload.expiryDuration,
       });
       io.to(`conversation:${conversation.id}`).emit('message:new', { message });
       if (typeof ack === 'function') ack({ ok: true, message });
