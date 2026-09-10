@@ -225,13 +225,13 @@ Real-time delivery with authenticated connections and conversation isolation.
 The core feature: timer-based and read-based self-destruction with coordinated purging.
 
 ### Tasks
-- [ ] Expiry metadata (expiry_type, duration, expires_at, read_at).
-- [ ] Timer-based expiry (countdown from send).
-- [ ] Read-based expiry (countdown from first open).
-- [ ] Server-side purge job/worker.
-- [ ] Client-side cached-content removal.
-- [ ] Socket expiry notification (`message:expired`).
-- [ ] Race-condition + duplicate-deletion handling.
+- [x] Expiry metadata (expiry_type, duration, expires_at, read_at).
+- [x] Timer-based expiry (countdown from send).
+- [x] Read-based expiry (countdown from first open).
+- [x] Server-side purge job/worker.
+- [x] Client-side cached-content removal.
+- [x] Socket expiry notification (`message:expired`).
+- [x] Race-condition + duplicate-deletion handling.
 
 ### Tests (test heavily)
 - [ ] Message disappears after configured time.

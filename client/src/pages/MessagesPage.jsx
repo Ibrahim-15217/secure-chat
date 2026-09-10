@@ -14,6 +14,14 @@ function decryptWith(message, myId, privateKeyJwk) {
   )
 }
 
+function isExpired(m, t) {
+  if (m.expiry_type === 'time' && m.expires_at) return t >= new Date(m.expires_at).getTime()
+  if (m.expiry_type === 'read' && m.read_at && m.expiry_duration) {
+    return t >= new Date(m.read_at).getTime() + m.expiry_duration * 1000
+  }
+  return false
+}
+
 export default function MessagesPage() {
   const { user, token } = useAuth()
   const { keypair } = useKeypair(user?.id)
@@ -28,6 +36,27 @@ export default function MessagesPage() {
   const bottomRef = useRef(null)
   const typingSentRef = useRef(false)
   const typingTimerRef = useRef(null)
+  const [expirySelect, setExpirySelect] = useState('')
+  const [now, setNow] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const t = Date.now()
+      setNow(t)
+      setMessages((ms) => ms.filter((m) => !isExpired(m, t)))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  function remainingSeconds(m, t) {
+    if (m.expiry_type === 'time' && m.expires_at) {
+      return Math.max(0, Math.ceil((new Date(m.expires_at).getTime() - t) / 1000))
+    }
+    if (m.expiry_type === 'read' && m.read_at && m.expiry_duration) {
+      return Math.max(0, Math.ceil((new Date(m.read_at).getTime() + m.expiry_duration * 1000 - t) / 1000))
+    }
+    return null
+  }
 
   const selected = useMemo(
     () => conversations.find((c) => c.id === selectedId) || null,
@@ -132,15 +161,22 @@ export default function MessagesPage() {
     const onTypingStop = (data) => {
       if (data && data.conversationId === selectedId) setTypingUser(false)
     }
+    const onExpired = (data) => {
+      if (data && data.messageId) {
+        setMessages((ms) => ms.filter((m) => m.id !== data.messageId))
+      }
+    }
     socket.on('message:new', onNew)
     socket.on('message:read', onRead)
     socket.on('typing:start', onTypingStart)
     socket.on('typing:stop', onTypingStop)
+    socket.on('message:expired', onExpired)
     return () => {
       socket.off('message:new', onNew)
       socket.off('message:read', onRead)
       socket.off('typing:start', onTypingStart)
       socket.off('typing:stop', onTypingStop)
+      socket.off('message:expired', onExpired)
     }
   }, [token, selectedId, appendDecrypted, refreshConversations, user])
 
@@ -163,16 +199,37 @@ export default function MessagesPage() {
     try {
       const recipientPub = await api.getPublicKey(selected.other_participant_id)
       const payload = await encryptMessageFor(text, [recipientPub.publicKey, keypair.publicJwk])
-      await api.sendMessage(selected.id, {
+      const messageBody = {
         ciphertext: payload.ciphertext,
         iv: payload.iv,
         wrappedKey: payload.wrappedKeys[0],
         senderWrappedKey: payload.wrappedKeys[1],
-      })
+      }
+      if (expirySelect) {
+        const [et, ed] = expirySelect.split(':')
+        messageBody.expiryType = et
+        messageBody.expiryDuration = Number(ed)
+      }
+      if (getSocket() && getSocket().connected) {
+        const sent = await new Promise((resolve) => {
+          const timer = setTimeout(() => resolve(null), 4000)
+          getSocket().emit('message:send', { conversationId: selected.id, ...messageBody }, (resp) => {
+            clearTimeout(timer)
+            resolve(resp || {})
+          })
+        })
+        if (!sent || !sent.ok) {
+          setError((sent && sent.error) || 'Message could not be delivered in real time')
+          return
+        }
+      } else {
+        await api.sendMessage(selected.id, messageBody)
+      }
       getSocket()?.emit('typing:stop', { conversationId: selected.id })
       typingSentRef.current = false
       setTypingUser(false)
       setDrafts((d) => ({ ...d, [selected.id]: '' }))
+      setExpirySelect('')
       const data = await api.listMessages(selected.id)
       const decrypted = await Promise.all(
         data.messages.map(async (m) => {
@@ -310,6 +367,9 @@ export default function MessagesPage() {
                           <div className="break-words whitespace-pre-wrap">{m.text}</div>
                           <div className="mt-1 text-[11px] opacity-70">
                             {m.read_at ? 'read' : m.recipient_id === user.id && !m.read_at ? 'sent' : ''}
+                            {remainingSeconds(m, now) !== null && (
+                              <span className="text-amber-300"> · {remainingSeconds(m, now)}s</span>
+                            )}
                           </div>
                         </div>
                         <button
@@ -327,6 +387,22 @@ export default function MessagesPage() {
                 </div>
 
                 <form onSubmit={sendMessage} className="border-t border-slate-800 p-4 flex gap-3">
+                  <select
+                    value={expirySelect}
+                    onChange={(e) => setExpirySelect(e.target.value)}
+                    title="Self-destruct timing"
+                    className="px-2 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="">Never</option>
+                    <option value="time:10">Time · 10s</option>
+                    <option value="time:30">Time · 30s</option>
+                    <option value="time:60">Time · 1m</option>
+                    <option value="time:300">Time · 5m</option>
+                    <option value="read:10">Read · 10s</option>
+                    <option value="read:30">Read · 30s</option>
+                    <option value="read:60">Read · 1m</option>
+                    <option value="read:300">Read · 5m</option>
+                  </select>
                   <input
                     value={drafts[selected.id] || ''}
                     onChange={(e) => {
