@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: secure-chat-api
+    runtime: node
+    plan: starter
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CLIENT_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1h
+    healthCheckPath: /api/health

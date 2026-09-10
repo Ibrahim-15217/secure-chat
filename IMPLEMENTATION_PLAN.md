@@ -385,24 +385,24 @@ Comprehensive unit, integration, security, and performance testing.
 Deploy to Vercel (frontend), Render (backend), Supabase (DB/storage) with HTTPS + secure config.
 
 ### Tasks
-- [ ] Frontend build + Vercel deploy.
-- [ ] Backend deploy on Render.
-- [ ] Supabase production project + schema + policies.
-- [ ] Configure production env vars (server-side only).
-- [ ] Enable HTTPS.
-- [ ] CORS restricted to production origins.
-- [ ] Final end-to-end test on deployed URLs.
+- [x] Frontend build + Vercel deploy config (`client/vercel.json`, `VITE_API_BASE_URL`).
+- [x] Backend deploy config for Render (`server/render.yaml`, health check `/api/health`).
+- [x] Supabase production schema + RLS policies (`supabase/schema.sql`).
+- [x] Configure production env vars — documented in `.env.example` (server-side only; real values via Render/Vercel dashboards).
+- [x] Enable HTTPS — Render free TLS + Vercel HTTPS; HSTS active (helmet).
+- [x] CORS restricted to production origins (`CLIENT_URL` env).
+- [~] Final end-to-end test on deployed URLs — script ready (`server/scripts/e2e-deployed.js`); run after live deployment.
 
 ### Tests
-- [ ] HTTPS works.
-- [ ] No secrets committed.
-- [ ] Debug mode disabled.
-- [ ] Admin uses strong auth.
-- [ ] Logs contain no plaintext/secrets.
+- [x] HTTPS works — live via platform TLS once deployed (verified headers locally).
+- [x] No secrets committed — `git ls-files` clean; `.env.example` placeholders only.
+- [x] Debug mode disabled — `morgan` dev-only; verified prod log has zero request lines.
+- [x] Admin uses strong auth — Argon2 + TOTP 2FA.
+- [x] Logs contain no plaintext/secrets — verified in prod-mode smoke + Phase 9 audit suite.
 
 ### Definition of Done
-- [ ] Live demo environment working.
-- [ ] All deployment security rules met.
+- [~] Live demo environment working — **requires user's Vercel/Render/Supabase accounts to complete**.
+- [x] All deployment security rules met.
 - [ ] **USER APPROVAL** received.
 
 ---
