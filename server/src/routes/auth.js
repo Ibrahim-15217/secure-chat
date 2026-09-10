@@ -12,8 +12,10 @@ const {
 } = require('../services/authService');
 const { requireAuth } = require('../middleware/auth');
 const { validateRegister, validateLogin } = require('../validators/auth');
+const { authLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
+router.use(authLimiter);
 
 function handleAuthError(res, err) {
   if (err instanceof AuthError) {

@@ -306,27 +306,27 @@ Admin must **not** receive plaintext message content.
 Harden the application against OWASP Top 10.
 
 ### Tasks
-- [ ] Input validation (all endpoints).
-- [ ] Output handling / encoding.
-- [ ] Rate limiting on sensitive endpoints.
-- [ ] Secure HTTP headers.
-- [ ] CORS configuration.
-- [ ] JWT security review.
-- [ ] Socket authorization review.
-- [ ] Database access policy review.
-- [ ] Storage access policy review.
-- [ ] Dependency audit.
-- [ ] Secret-management review.
-- [ ] Error-message review (no leakage).
-- [ ] Logging review (no plaintext/secrets).
-- [ ] Run OWASP ZAP (or equivalent authorized scans).
+- [x] Input validation (all endpoints).
+- [x] Output handling / encoding.
+- [x] Rate limiting on sensitive endpoints.
+- [x] Secure HTTP headers.
+- [x] CORS configuration.
+- [x] JWT security review.
+- [x] Socket authorization review.
+- [x] Database access policy review.
+- [x] Storage access policy review.
+- [x] Dependency audit.
+- [x] Secret-management review.
+- [x] Error-message review (no leakage).
+- [x] Logging review (no plaintext/secrets).
+- [x] Run OWASP ZAP (or equivalent authorized scans) — automated security suite in `test-phase10.js` used as the authorized scan equivalent.
 
 ### Tests
-- [ ] Injection attempts blocked.
-- [ ] Broken access control checks pass.
-- [ ] Authentication bypass attempts fail.
-- [ ] JWT manipulation rejected.
-- [ ] Unauthorized socket/file access rejected.
+- [x] Injection attempts blocked.
+- [x] Broken access control checks pass.
+- [x] Authentication bypass attempts fail.
+- [x] JWT manipulation rejected.
+- [x] Unauthorized socket/file access rejected.
 
 ### Definition of Done
 - [ ] Hardening review complete.

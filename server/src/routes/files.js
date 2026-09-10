@@ -2,6 +2,7 @@ const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const conversationStore = require('../services/conversationStore');
 const fileStore = require('../services/fileStore');
+const { fileLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get('/:id/download', (req, res) => {
 });
 
 router.use(requireAuth);
+router.use(fileLimiter);
 
 router.get('/conversation/:conversationId', (req, res) => {
   const conversation = conversationStore.conversations.findById(req.params.conversationId);

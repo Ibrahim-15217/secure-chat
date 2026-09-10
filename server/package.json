@@ -1,27 +1,32 @@
-{
-  "name": "secure-chat-server",
-  "version": "1.0.0",
-  "description": "Backend for the Secure Chat application with self-destructing messages",
-  "main": "src/app.js",
-  "type": "commonjs",
-  "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "argon2": "^0.45.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.0",
-    "otplib": "^13.5.0",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
-    "uuid": "^14.0.2"
-  }
+﻿{
+    "name":  "secure-chat-server",
+    "version":  "1.0.0",
+    "description":  "Backend for the Secure Chat application with self-destructing messages",
+    "main":  "src/app.js",
+    "type":  "commonjs",
+    "scripts":  {
+                    "start":  "node src/server.js",
+                    "dev":  "node --watch src/server.js"
+                },
+    "engines":  {
+                    "node":  "\u003e=18"
+                },
+    "dependencies":  {
+                         "argon2":  "^0.45.1",
+                         "cors":  "^2.8.5",
+                         "dotenv":  "^16.4.5",
+                         "express":  "^4.19.2",
+                         "express-rate-limit":  "^8.7.0",
+                         "helmet":  "^7.1.0",
+                         "jsonwebtoken":  "^9.0.3",
+                         "morgan":  "^1.10.0",
+                         "otplib":  "^13.5.0",
+                         "qs":  "^6.16.0",
+                         "socket.io":  "^4.8.3",
+                         "socket.io-client":  "^4.8.3",
+                         "uuid":  "^14.0.2"
+                     },
+    "overrides":  {
+                      "qs":  "^6.16.0"
+                  }
 }
