@@ -19,74 +19,84 @@ export default function RegisterPage() {
     }
     setSubmitting(true)
     register({ name: form.name, email: form.email, password: form.password })
-      .then(() => navigate('/dashboard'))
+      .then(() => navigate('/messages'))
       .catch((err) => setError(err.message))
       .finally(() => setSubmitting(false))
   }
 
   return (
     <AuthLayout title="Create your account" subtitle="Start sending encrypted messages">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Name</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Name</label>
           <input
             type="text"
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="Your name"
+            autoComplete="name"
           />
         </div>
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Email</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Email</label>
           <input
             type="email"
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="you@example.com"
+            autoComplete="email"
           />
         </div>
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Password</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Password</label>
           <input
             type="password"
             required
             minLength={8}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="At least 8 characters"
+            autoComplete="new-password"
           />
-          <p className="mt-1 text-xs text-slate-500">At least 8 characters</p>
         </div>
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Confirm password</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Confirm password</label>
           <input
             type="password"
             required
             value={form.confirm}
             onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="Re-enter password"
+            autoComplete="new-password"
           />
         </div>
 
         {error && (
-          <div className="text-sm text-red-400 bg-red-950/50 border border-red-800 rounded-lg p-3">
+          <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
             {error}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium disabled:opacity-50"
-        >
-          {submitting ? 'Creating account...' : 'Create account'}
+        <button type="submit" disabled={submitting} className="btn-primary w-full mt-1">
+          {submitting ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Creating account...
+            </span>
+          ) : (
+            'Create account'
+          )}
         </button>
 
-        <p className="text-sm text-slate-400 text-center">
+        <p className="text-sm text-night-300 text-center pt-1">
           Already have an account?{' '}
-          <Link to="/login" className="text-cyan-400 hover:underline">
+          <Link to="/login" className="text-aurora-400 hover:text-aurora-300 font-medium transition-colors">
             Sign in
           </Link>
         </p>

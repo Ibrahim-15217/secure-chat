@@ -19,7 +19,7 @@ export default function TwoFactorVerifyPage() {
     setError('')
     setSubmitting(true)
     verify2fa(pendingToken, code)
-      .then(() => navigate('/dashboard'))
+      .then(() => navigate('/messages'))
       .catch((err) => setError(err.message))
       .finally(() => setSubmitting(false))
   }
@@ -28,7 +28,7 @@ export default function TwoFactorVerifyPage() {
     <AuthLayout title="Two-factor authentication" subtitle="Enter the 6-digit code from your authenticator app">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Verification code</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Verification code</label>
           <input
             type="text"
             required
@@ -39,28 +39,41 @@ export default function TwoFactorVerifyPage() {
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
             placeholder="000000"
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 tracking-widest text-center text-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field text-center text-xl tracking-[0.4em] font-mono"
           />
+          <div className="flex justify-center gap-1.5 mt-3">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className={`h-1.5 w-8 rounded-full transition-colors ${
+                  i < code.length ? 'bg-aurora-400' : 'bg-night-600'
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         {error && (
-          <div className="text-sm text-red-400 bg-red-950/50 border border-red-800 rounded-lg p-3">
+          <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
             {error}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting || code.length !== 6}
-          className="w-full px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium disabled:opacity-50"
-        >
-          {submitting ? 'Verifying...' : 'Verify'}
+        <button type="submit" disabled={submitting || code.length !== 6} className="btn-primary w-full">
+          {submitting ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Verifying...
+            </span>
+          ) : (
+            'Verify'
+          )}
         </button>
 
         <button
           type="button"
           onClick={() => navigate('/login')}
-          className="w-full text-center text-sm text-slate-400 hover:text-slate-200"
+          className="w-full text-center text-sm text-night-400 hover:text-night-200 transition-colors"
         >
           Back to sign in
         </button>

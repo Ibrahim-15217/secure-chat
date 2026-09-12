@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import AuthLayout from '../layouts/AuthLayout'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -17,10 +16,10 @@ export default function LoginPage() {
     setSubmitting(true)
     login(form)
       .then((result) => {
-        if (result.requiresTwoFactor) {
+        if (result?.pendingToken) {
           navigate('/verify-2fa', { state: { pendingToken: result.pendingToken } })
         } else {
-          navigate(location.state?.from || '/dashboard')
+          navigate('/messages')
         }
       })
       .catch((err) => setError(err.message))
@@ -28,47 +27,54 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to your account">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthLayout title="Welcome back" subtitle="Sign in to your encrypted messenger">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Email</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Email</label>
           <input
             type="email"
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="you@example.com"
+            autoComplete="email"
           />
         </div>
         <div>
-          <label className="block text-sm text-slate-300 mb-1">Password</label>
+          <label className="block text-xs font-medium text-night-200 mb-1.5">Password</label>
           <input
             type="password"
             required
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="field"
+            placeholder="Enter your password"
+            autoComplete="current-password"
           />
         </div>
 
         {error && (
-          <div className="text-sm text-red-400 bg-red-950/50 border border-red-800 rounded-lg p-3">
+          <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
             {error}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium disabled:opacity-50"
-        >
-          {submitting ? 'Signing in...' : 'Sign in'}
+        <button type="submit" disabled={submitting} className="btn-primary w-full mt-1">
+          {submitting ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Signing in...
+            </span>
+          ) : (
+            'Sign in'
+          )}
         </button>
 
-        <p className="text-sm text-slate-400 text-center">
-          No account?{' '}
-          <Link to="/register" className="text-cyan-400 hover:underline">
-            Register
+        <p className="text-sm text-night-300 text-center pt-1">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-aurora-400 hover:text-aurora-300 font-medium transition-colors">
+            Create one
           </Link>
         </p>
       </form>

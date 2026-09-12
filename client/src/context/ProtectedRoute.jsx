@@ -6,8 +6,13 @@ export default function ProtectedRoute() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 rounded-xl aurora-bg flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-aurora-500/30 pulse-soft">
+            SC
+          </div>
+          <div className="text-xs text-night-300">Establishing secure session…</div>
+        </div>
       </div>
     )
   }
