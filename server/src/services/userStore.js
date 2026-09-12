@@ -2,24 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
+const { readJsonArray, writeJsonArray } = require('./opsStore');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'users.json');
 
-function ensureFile() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '[]', 'utf8');
-}
-
 function readUsers() {
-  ensureFile();
-  const raw = fs.readFileSync(DB_FILE, 'utf8');
-  return raw ? JSON.parse(raw) : [];
+  return readJsonArray(DB_FILE);
 }
 
 function writeUsers(users) {
-  ensureFile();
-  fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2), 'utf8');
+  writeJsonArray(DB_FILE, users);
 }
 
 function hashToken(token) {

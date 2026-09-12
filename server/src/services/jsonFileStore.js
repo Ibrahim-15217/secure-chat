@@ -1,26 +1,16 @@
-const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+const { DATA_DIR, readJsonArray, writeJsonArray } = require('./opsStore');
 
 function makeStore(filename) {
   const file = path.join(DATA_DIR, filename);
 
-  function ensureFile() {
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    if (!fs.existsSync(file)) fs.writeFileSync(file, '[]', 'utf8');
-  }
-
   function readAll() {
-    ensureFile();
-    const raw = fs.readFileSync(file, 'utf8');
-    return raw ? JSON.parse(raw) : [];
+    return readJsonArray(file);
   }
 
   function writeAll(items) {
-    ensureFile();
-    fs.writeFileSync(file, JSON.stringify(items, null, 2), 'utf8');
+    writeJsonArray(file, items);
   }
 
   function findAll() {
