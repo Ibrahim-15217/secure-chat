@@ -16,7 +16,12 @@ const filesRoutes = require('./routes/files');
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: config.clientUrl }));
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || config.clientOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
+}));
 app.use(express.json());
 
 if (config.env === 'development') {

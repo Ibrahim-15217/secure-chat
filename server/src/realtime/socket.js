@@ -8,7 +8,7 @@ const { validateMessageBody } = require('../validators/messages');
 function attachRealtime(httpServer) {
   const io = new Server(httpServer, {
     cors: {
-      origin: config.clientUrl,
+      origin: config.clientOrigins,
       credentials: true,
     },
   });
