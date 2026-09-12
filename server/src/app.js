@@ -41,7 +41,7 @@ app.use((err, req, res, next) => {
   const status = typeof err.status === 'number' && err.status >= 400 && err.status < 500 ? err.status : 500;
   if (status !== 413) console.error(err);
   if (status === 413) return res.status(413).json({ error: 'Payload too large' });
-  return res.status(500).json({ error: 'Internal server error' });
+  return res.status(500).json({ error: 'Internal server error', detail: err.message });
 });
 
 module.exports = app;

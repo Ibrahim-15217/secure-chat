@@ -23,7 +23,7 @@ function handleAuthError(res, err) {
   }
   // eslint-disable-next-line no-console
   console.error(err);
-  return res.status(500).json({ error: 'Internal server error' });
+  return res.status(500).json({ error: 'Internal server error', detail: err.message });
 }
 
 router.post('/register', async (req, res) => {
